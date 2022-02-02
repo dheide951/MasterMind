@@ -14,8 +14,12 @@ const ColorOption = (props) => {
 const Hint = (props) => {
     return (
         <div className="hint">
-            <div className="counter">{props.hint.rightColorWrongPlace}</div>
-            <div className="counter">{props.hint.rightColorRightPlace}</div>
+            {/* <div className="counter">{props.hint.rightColorWrongPlace}</div>
+            <div className="counter">{props.hint.rightColorRightPlace}</div> */}
+             <div className="hint-circle hint-circle-1"></div>
+             <div className="hint-circle hint-circle-2"></div>
+             <div className="hint-circle hint-circle-3"></div>
+             <div className="hint-circle hint-circle-4"></div>
         </div>
     )
 }
