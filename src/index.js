@@ -11,21 +11,27 @@ const ColorOption = (props) => {
     )
 }
 
-const Hint = () => {
+const Hint = (props) => {
     return (
-        <div className="box hint" />
+        <div className="hint">
+            <div className="counter">{props.hint.rightColorWrongPlace}</div>
+            <div className="counter">{props.hint.rightColorRightPlace}</div>
+        </div>
     )
 }
 
 const GameStage = (props) => {
-
     return (
         <div className="game-stage">
-            <div className="box" style={{backgroundColor: props.colors[0]}}/>
-            <div className="box" style={{backgroundColor: props.colors[1]}}/>
-            <div className="box" style={{backgroundColor: props.colors[2]}}/>
-            <div className="box" style={{backgroundColor: props.colors[3]}}/>
-            <Hint />
+            <div className="stage-colors">
+                <div className="box" style={{backgroundColor: props.colors[0]}}/>
+                <div className="box" style={{backgroundColor: props.colors[1]}}/>
+                <div className="box" style={{backgroundColor: props.colors[2]}}/>
+                <div className="box" style={{backgroundColor: props.colors[3]}}/>
+            </div>
+            <div>
+                <Hint hint={props.hint}/>
+            </div>
         </div>
     )
 }
@@ -34,28 +40,63 @@ const Game = () => {
     const [stage, setStage] = useState(0);
     const [step, setStep] = useState(0);
     const [board, setBoard] = useState(startingBoard);
-    const [used, setUsed] = useState([])
+    const [used, setUsed] = useState([]);
+    const [winningColors, setWinningColors] = useState(randomColors);
+    const [hints, setHints] = useState(startingHints);
+    const [gameOver, setGameOver] = useState(false);
 
+    // console.log(winningColors)
+
+    const reset = () => {
+        setBoard(startingBoard)
+        setStep(0);
+        setStage(0);
+        setUsed([])
+        setHints(startingHints)
+        setWinningColors(randomColors)
+    }
 
     const onButtonClick = (color) => {
 
-        if(used.includes(color)) {
+        if (used.includes(color)) {
             return;
         }
 
         let copy = {...board};
         copy[stage][step] = color;
         setBoard(copy);
-        let usedColors = used.concat(color);
-        setUsed(usedColors)
-        console.log(used)
 
-        setStep(step + 1)
+        let usedColors = used.concat(color);
+        console.log(usedColors)
+
+        let copyOfHints = {...hints};
+        let hint = copyOfHints[stage]
+
+        // console.log(color === winningColors[step])
+        if(color === winningColors[step]) {
+            hint.rightColorRightPlace++;
+        }
+        if(color !== winningColors[step] && winningColors.includes(color)) {
+            hint.rightColorWrongPlace++;
+        }
+
         if (step === 3) {
+
+            if (usedColors.every((v, i) => v === winningColors[i])) {
+                reset();
+                return;
+            }
+
             setStep(0)
             setStage(stage + 1)
             setUsed([])
+
+            return;
         }
+
+        setUsed(usedColors)
+        setHints(copyOfHints)
+        setStep(step + 1)
 
     }
 
@@ -64,28 +105,63 @@ const Game = () => {
             <div className="game-board">
                 <div className="main">
                     {utils.range(0, 9).map(number => (
-                        <GameStage key={number} stage={number} colors={board[number]}/>
+                        <GameStage key={number} stage={number} colors={board[number]} hint={hints[number]}/>
                     ))}
                 </div>
-                <div className="color-options">
-                    <ColorOption color={colors.purple} onClick={onButtonClick}/>
-                    <ColorOption color={colors.green} onClick={onButtonClick} />
-                    <ColorOption color={colors.blue} onClick={onButtonClick} />
-                    <ColorOption color={colors.yellow} onClick={onButtonClick} />
-                    <ColorOption color={colors.red} onClick={onButtonClick} />
-                    <ColorOption color={colors.orange} onClick={onButtonClick} />
+                <div className="control-panel">
+                    <div className="color-options">
+                        <ColorOption color={colors.purple} onClick={onButtonClick}/>
+                        <ColorOption color={colors.green} onClick={onButtonClick}/>
+                        <ColorOption color={colors.blue} onClick={onButtonClick}/>
+                        <ColorOption color={colors.yellow} onClick={onButtonClick}/>
+                        <ColorOption color={colors.red} onClick={onButtonClick}/>
+                        <ColorOption color={colors.orange} onClick={onButtonClick}/>
+                    </div>
+                    <div className="settings">
+                        <button className="box setting" onClick={reset}>
+                            Reset
+                        </button>
+                    </div>
                 </div>
+            </div>
+            <div className="answer">
+                <div className="box" style={{backgroundColor: winningColors[0]}}/>
+                <div className="box" style={{backgroundColor: winningColors[1]}}/>
+                <div className="box" style={{backgroundColor: winningColors[2]}}/>
+                <div className="box" style={{backgroundColor: winningColors[3]}}/>
             </div>
         </div>
     )
 }
 
+const randomColors = () => {
+    const options = [colors.red, colors.orange, colors.blue, colors.green, colors.yellow, colors.purple];
+    const used = [];
+
+    while (used.length < 4) {
+        let color = options[utils.random(0, 3)]
+        if (!used.includes(color)) {
+            used.push(color);
+        }
+    }
+
+    return used;
+}
+
 const startingBoard = () => {
     let board = [];
-    for(let x = 0; x < 10; x++) {
+    for (let x = 0; x < 10; x++) {
         board.push([colors.grey, colors.grey, colors.grey, colors.grey])
     }
     return board;
+}
+
+const startingHints = () => {
+    let hints = [];
+    for (let x = 0; x < 10; x++) {
+        hints.push({rightColorWrongPlace: 0, rightColorRightPlace: 0})
+    }
+    return hints;
 }
 
 const colors = {
