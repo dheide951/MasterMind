@@ -7,6 +7,7 @@ const ColorOption = (props) => {
         <button
             className="box option" style={{backgroundColor: props.color}}
             onClick={() => props.onClick(props.color)}
+            disabled={props.gameOver}
         />
     )
 }
@@ -44,10 +45,13 @@ const Game = () => {
     const [winningColors, setWinningColors] = useState(randomColors);
     const [hints, setHints] = useState(startingHints);
     const [gameOver, setGameOver] = useState(false);
+    const [winner, setWinner] = useState(false);
 
     // console.log(winningColors)
 
     const reset = () => {
+        setGameOver(false)
+        setWinner(false)
         setBoard(startingBoard)
         setStep(0);
         setStage(0);
@@ -67,23 +71,40 @@ const Game = () => {
         setBoard(copy);
 
         let usedColors = used.concat(color);
-        console.log(usedColors)
+        // console.log(usedColors)
 
         let copyOfHints = {...hints};
         let hint = copyOfHints[stage]
 
         // console.log(color === winningColors[step])
-        if(color === winningColors[step]) {
-            hint.rightColorRightPlace++;
-        }
-        if(color !== winningColors[step] && winningColors.includes(color)) {
-            hint.rightColorWrongPlace++;
-        }
+        // if(color === winningColors[step]) {
+        //     hint.rightColorRightPlace++;
+        // }
+        // if(color !== winningColors[step] && winningColors.includes(color)) {
+        //     hint.rightColorWrongPlace++;
+        // }
 
         if (step === 3) {
 
+            usedColors.forEach((v, i) => {
+                if(v === winningColors[i]) {
+                    hint.rightColorRightPlace++;
+                }
+                if(v !== winningColors[i] && winningColors.includes(v)) {
+                    hint.rightColorWrongPlace++;
+                }
+            })
+            setHints(copyOfHints)
+
             if (usedColors.every((v, i) => v === winningColors[i])) {
-                reset();
+                setGameOver(true);
+                setWinner(true);
+                // reset();
+                return;
+            }
+
+            if (stage === 9) {
+                setGameOver(true)
                 return;
             }
 
@@ -95,13 +116,13 @@ const Game = () => {
         }
 
         setUsed(usedColors)
-        setHints(copyOfHints)
         setStep(step + 1)
 
     }
 
     return (
         <div className="game">
+            <div className="title">MasterMind</div>
             <div className="game-board">
                 <div className="main">
                     {utils.range(0, 9).map(number => (
@@ -110,12 +131,12 @@ const Game = () => {
                 </div>
                 <div className="control-panel">
                     <div className="color-options">
-                        <ColorOption color={colors.purple} onClick={onButtonClick}/>
-                        <ColorOption color={colors.green} onClick={onButtonClick}/>
-                        <ColorOption color={colors.blue} onClick={onButtonClick}/>
-                        <ColorOption color={colors.yellow} onClick={onButtonClick}/>
-                        <ColorOption color={colors.red} onClick={onButtonClick}/>
-                        <ColorOption color={colors.orange} onClick={onButtonClick}/>
+                        <ColorOption color={colors.purple} gameOver={gameOver} onClick={onButtonClick}/>
+                        <ColorOption color={colors.green} gameOver={gameOver} onClick={onButtonClick}/>
+                        <ColorOption color={colors.blue} gameOver={gameOver} onClick={onButtonClick}/>
+                        <ColorOption color={colors.yellow} gameOver={gameOver} onClick={onButtonClick}/>
+                        <ColorOption color={colors.red} gameOver={gameOver} onClick={onButtonClick}/>
+                        <ColorOption color={colors.orange} gameOver={gameOver} onClick={onButtonClick}/>
                     </div>
                     <div className="settings">
                         <button className="box setting" onClick={reset}>
@@ -129,6 +150,9 @@ const Game = () => {
                 <div className="box" style={{backgroundColor: winningColors[1]}}/>
                 <div className="box" style={{backgroundColor: winningColors[2]}}/>
                 <div className="box" style={{backgroundColor: winningColors[3]}}/>
+            </div>
+            <div className="gameOver">
+
             </div>
         </div>
     )

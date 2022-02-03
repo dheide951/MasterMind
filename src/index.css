@@ -4,6 +4,15 @@
     margin: 0 auto;
 }
 
+.title {
+    font-size: 3em;
+    /*width: 60%;*/
+    /*background-color: #ddd;*/
+    /*border-radius: 5px;*/
+    /*margin: 5px;*/
+    /*padding: 10px;*/
+}
+
 .option {
     padding: 0;
     border: none;
@@ -29,7 +38,12 @@
 
 .answer {
     margin-top: 25px;
-    /*display: none;*/
+    display: none;
+}
+
+button:disabled {
+    opacity: 30%;
+    cursor: auto;
 }
 
 .counter {
@@ -70,7 +84,7 @@
     /*margin-left: 25px;*/
     background-color: #ddd;
     /*padding: px;*/
-    width: 100px;
+    width: 50px;
     height: 50px;
     text-align: center;
     border-radius: 5px;
